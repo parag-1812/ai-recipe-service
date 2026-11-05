@@ -41,9 +41,12 @@ public class AiRecipeService {
               "dietaryTags"        -> array from Jain, Gluten Free, High Protein, Keto, Vegan, Homemade Style, Restaurant Style, Healthy, Low Calories ([] if none)
               "specialInstructions"-> free text like "boneless" or "thick gravy", or "" if none
               "summary"            -> one friendly sentence summarizing the dish
+              "nutrition"          -> object { "calories": int, "proteinGrams": int, "carbsGrams": int, "fatGrams": int } estimated for ONE serving
+              "suggestions"        -> array of 2-3 short alternative or popular dish ideas the customer might also enjoy, each a short orderable description (e.g. "Paneer tikka, grilled, mild")
 
             Infer sensible values where the customer is silent. Only include
-            ingredients and dietary tags the request actually implies.
+            ingredients and dietary tags the request actually implies. Make a
+            reasonable nutrition estimate for a typical single serving.
             """;
 
     private final HttpClient http = HttpClient.newBuilder()

@@ -6,38 +6,57 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 /**
- * The structured recipe Claude produces from a customer's natural-language
- * request. The field descriptions double as the schema the model is
- * constrained to (via structured outputs), so keep the allowed values accurate.
+ * The structured recipe Claude/Groq produces from a customer's natural-language
+ * request, now including an estimated nutrition breakdown and a few suggested
+ * alternative dishes the customer might also enjoy.
  */
 @JsonClassDescription("A structured representation of a customer's custom dish request for a cloud kitchen.")
 public record ParsedDish(
 
-        @JsonPropertyDescription("Overall classification. Must be exactly \"VEG\" or \"NON_VEG\". Use NON_VEG if any animal protein (chicken, mutton, fish, egg, prawn, etc.) is present; otherwise VEG.")
+        @JsonPropertyDescription("Overall classification. Must be exactly \"VEG\" or \"NON_VEG\".")
         String dishType,
 
-        @JsonPropertyDescription("Primary protein, if any. One of: Chicken, Paneer, Egg, Mutton, Fish, Soya, Tofu. Use an empty string if the dish has no distinct protein.")
+        @JsonPropertyDescription("Primary protein, if any. One of: Chicken, Paneer, Egg, Mutton, Fish, Soya, Tofu. Empty string if none.")
         String protein,
 
-        @JsonPropertyDescription("All vegetables and ingredients the customer explicitly asked for, e.g. [\"Garlic\", \"Tomato\", \"Coriander\"]. Empty list if none specified.")
+        @JsonPropertyDescription("All vegetables and ingredients the customer explicitly asked for. Empty list if none.")
         List<String> ingredients,
 
-        @JsonPropertyDescription("Cooking style. One of: Curry, Dry, Fried, Grilled, Tandoor, Roasted, Baked, Steamed, Smoked. Make a best guess from the request if it is not stated.")
+        @JsonPropertyDescription("Cooking style. One of: Curry, Dry, Fried, Grilled, Tandoor, Roasted, Baked, Steamed, Smoked.")
         String cookingStyle,
 
-        @JsonPropertyDescription("Spice level. One of: No Spice, Mild, Medium, Hot, Extra Hot. Default to Medium if not stated.")
+        @JsonPropertyDescription("Spice level. One of: No Spice, Mild, Medium, Hot, Extra Hot. Default Medium.")
         String spiceLevel,
 
-        @JsonPropertyDescription("Oil preference. One of: No Oil, Less Oil, Medium Oil, Regular, Extra Butter, Ghee. Default to Medium Oil if not stated.")
+        @JsonPropertyDescription("Oil preference. One of: No Oil, Less Oil, Medium Oil, Regular, Extra Butter, Ghee. Default Medium Oil.")
         String oilLevel,
 
-        @JsonPropertyDescription("Dietary tags that apply, e.g. [\"Jain\", \"Gluten Free\", \"High Protein\", \"Keto\", \"Vegan\", \"Homemade Style\", \"Restaurant Style\", \"Healthy\", \"Low Calories\"]. Empty list if none apply.")
+        @JsonPropertyDescription("Dietary tags that apply. Empty list if none.")
         List<String> dietaryTags,
 
-        @JsonPropertyDescription("Any free-text special instructions for the kitchen, e.g. \"boneless chicken\", \"thick gravy\", \"soft cooked vegetables\". Empty string if none.")
+        @JsonPropertyDescription("Free-text special instructions for the kitchen. Empty string if none.")
         String specialInstructions,
 
-        @JsonPropertyDescription("A single friendly sentence summarizing the dish, for the customer to confirm before ordering.")
-        String summary
+        @JsonPropertyDescription("A single friendly sentence summarizing the dish, for the customer to confirm.")
+        String summary,
+
+        @JsonPropertyDescription("Estimated nutrition for one serving of this dish.")
+        Nutrition nutrition,
+
+        @JsonPropertyDescription("2-3 short alternative or popular dish ideas the customer might also enjoy, each phrased as a short orderable description.")
+        List<String> suggestions
 ) {
+
+    @JsonClassDescription("Estimated nutrition for a single serving.")
+    public record Nutrition(
+            @JsonPropertyDescription("Estimated calories (kcal) for one serving.")
+            int calories,
+            @JsonPropertyDescription("Estimated protein in grams for one serving.")
+            int proteinGrams,
+            @JsonPropertyDescription("Estimated carbohydrates in grams for one serving.")
+            int carbsGrams,
+            @JsonPropertyDescription("Estimated fat in grams for one serving.")
+            int fatGrams
+    ) {
+    }
 }
