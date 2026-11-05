@@ -43,6 +43,7 @@ public class AiRecipeService {
               "summary"            -> one friendly sentence summarizing the dish
               "nutrition"          -> object { "calories": int, "proteinGrams": int, "carbsGrams": int, "fatGrams": int } estimated for ONE serving
               "suggestions"        -> array of 2-3 short alternative or popular dish ideas the customer might also enjoy, each a short orderable description (e.g. "Paneer tikka, grilled, mild")
+              "confidence"         -> integer 0-100: how confident you are that you correctly understood the request (lower it for vague, ambiguous, or unusual requests)
 
             Infer sensible values where the customer is silent. Only include
             ingredients and dietary tags the request actually implies. Make a

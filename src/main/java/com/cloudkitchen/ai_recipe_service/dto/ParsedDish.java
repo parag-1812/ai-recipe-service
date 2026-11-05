@@ -44,7 +44,10 @@ public record ParsedDish(
         Nutrition nutrition,
 
         @JsonPropertyDescription("2-3 short alternative or popular dish ideas the customer might also enjoy, each phrased as a short orderable description.")
-        List<String> suggestions
+        List<String> suggestions,
+
+        @JsonPropertyDescription("Integer 0-100: how confident you are that you correctly understood the customer's request into this dish.")
+        int confidence
 ) {
 
     @JsonClassDescription("Estimated nutrition for a single serving.")
