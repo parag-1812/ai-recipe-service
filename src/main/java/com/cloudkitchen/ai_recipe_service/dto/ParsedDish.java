@@ -47,19 +47,19 @@ public record ParsedDish(
         List<String> suggestions,
 
         @JsonPropertyDescription("Integer 0-100: how confident you are that you correctly understood the customer's request into this dish.")
-        int confidence
+        Integer confidence
 ) {
 
     @JsonClassDescription("Estimated nutrition for a single serving.")
     public record Nutrition(
             @JsonPropertyDescription("Estimated calories (kcal) for one serving.")
-            int calories,
+            Integer calories,
             @JsonPropertyDescription("Estimated protein in grams for one serving.")
-            int proteinGrams,
+            Integer proteinGrams,
             @JsonPropertyDescription("Estimated carbohydrates in grams for one serving.")
-            int carbsGrams,
+            Integer carbsGrams,
             @JsonPropertyDescription("Estimated fat in grams for one serving.")
-            int fatGrams
+            Integer fatGrams
     ) {
     }
 }
