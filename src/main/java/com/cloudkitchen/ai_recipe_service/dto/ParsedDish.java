@@ -47,8 +47,22 @@ public record ParsedDish(
         List<String> suggestions,
 
         @JsonPropertyDescription("Integer 0-100: how confident you are that you correctly understood the customer's request into this dish.")
-        Integer confidence
+        Integer confidence,
+
+        @JsonPropertyDescription("Each ingredient (including the protein) classified by how essential it is to the dish, with a sensible substitute where one exists. Covers the same ingredients as the 'ingredients' list plus the protein.")
+        List<IngredientSpec> ingredientSpecs
 ) {
+
+    @JsonClassDescription("An ingredient with how essential it is to the dish and a possible substitute.")
+    public record IngredientSpec(
+            @JsonPropertyDescription("Ingredient name, e.g. \"Paneer\" or \"Spinach\".")
+            String name,
+            @JsonPropertyDescription("How essential: \"CORE\" (the dish isn't itself without it), \"SUBSTITUTABLE\" (central but a good swap exists), or \"OPTIONAL\" (a garnish/extra that can be skipped).")
+            String role,
+            @JsonPropertyDescription("A single sensible substitute ingredient name if role is SUBSTITUTABLE (e.g. \"Tofu\" for Paneer, \"Rice Flour\" for Wheat Flour), else empty string.")
+            String substitute
+    ) {
+    }
 
     @JsonClassDescription("Estimated nutrition for a single serving.")
     public record Nutrition(

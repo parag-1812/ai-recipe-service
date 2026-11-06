@@ -44,10 +44,13 @@ public class AiRecipeService {
               "nutrition"          -> object { "calories": int, "proteinGrams": int, "carbsGrams": int, "fatGrams": int } estimated for ONE serving
               "suggestions"        -> array of 2-3 short alternative or popular dish ideas the customer might also enjoy, each a short orderable description (e.g. "Paneer tikka, grilled, mild")
               "confidence"         -> integer 0-100: how confident you are that you correctly understood the request (lower it for vague, ambiguous, or unusual requests)
+              "ingredientSpecs"    -> array of { "name": string, "role": "CORE"|"SUBSTITUTABLE"|"OPTIONAL", "substitute": string } for EVERY ingredient AND the protein. CORE = the dish isn't itself without it; SUBSTITUTABLE = central but a good swap exists (give the swap in "substitute", e.g. Tofu for Paneer); OPTIONAL = a garnish/extra that can be skipped. Use "substitute":"" unless role is SUBSTITUTABLE.
 
             Infer sensible values where the customer is silent. Only include
             ingredients and dietary tags the request actually implies. Make a
-            reasonable nutrition estimate for a typical single serving.
+            reasonable nutrition estimate for a typical single serving. Respect
+            any dietary constraint the customer states (vegan, Jain, gluten-free,
+            keto, diabetic-friendly) when choosing ingredients and substitutes.
             """;
 
     private final HttpClient http = HttpClient.newBuilder()
