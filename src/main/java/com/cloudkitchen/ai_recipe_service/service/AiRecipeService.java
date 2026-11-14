@@ -97,7 +97,7 @@ public class AiRecipeService {
                     .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
                     .build();
 
-            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = sendWithRetry(request);
 
             if (response.statusCode() / 100 != 2) {
                 throw new IllegalStateException("Groq API error " + response.statusCode() + ": " + response.body());
@@ -116,5 +116,36 @@ public class AiRecipeService {
             Thread.currentThread().interrupt();
             throw new IllegalStateException("Interrupted while calling Groq", e);
         }
+    }
+
+    /**
+     * Send the request, retrying transient failures (network errors, HTTP 429
+     * rate limits, and 5xx) with a short backoff so a momentary Groq hiccup
+     * doesn't dead-end an order. Non-transient responses return immediately.
+     */
+    private HttpResponse<String> sendWithRetry(HttpRequest request)
+            throws IOException, InterruptedException {
+        int maxAttempts = 3;
+        IOException lastIo = null;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+                int code = response.statusCode();
+                boolean transientError = code == 429 || code >= 500;
+                if (!transientError || attempt == maxAttempts) {
+                    return response;
+                }
+            } catch (IOException e) {
+                lastIo = e;
+                if (attempt == maxAttempts) {
+                    throw e;
+                }
+            }
+            Thread.sleep(300L * attempt); // 300ms, 600ms backoff
+        }
+        if (lastIo != null) {
+            throw lastIo;
+        }
+        throw new IllegalStateException("Groq request failed after retries");
     }
 }
