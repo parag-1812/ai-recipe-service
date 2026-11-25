@@ -2,6 +2,7 @@ package com.cloudkitchen.ai_recipe_service.config;
 
 import com.cloudkitchen.ai_recipe_service.security.JwtAuthenticationFilter;
 import com.cloudkitchen.ai_recipe_service.security.JwtUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +17,10 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+
+    /** Comma-separated origins allowed to call this API, e.g. https://your-app.vercel.app (env CORS_ALLOWED_ORIGINS). */
+    @Value("${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5175}")
+    private String allowedOrigins;
 
     private final JwtUtil jwtUtil;
 
@@ -45,7 +50,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5175"));
+        configuration.setAllowedOriginPatterns(List.of(allowedOrigins.trim().split("\\s*,\\s*")));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
